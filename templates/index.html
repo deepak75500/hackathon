@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gradient-to-br from-black via-gray-900 to-black text-white">
+<head>
+  <meta charset="UTF-8">
+  <title>Schedulo Lite+ | Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glow {
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.6),
+                  0 0 20px rgba(0, 255, 255, 0.4),
+                  0 0 30px rgba(0, 255, 255, 0.2);
+    }
+    .glow-red {
+      box-shadow: 0 0 10px rgba(255, 0, 102, 0.6),
+                  0 0 20px rgba(255, 0, 102, 0.4),
+                  0 0 30px rgba(255, 0, 102, 0.2);
+    }
+    .glass {
+      backdrop-filter: blur(16px);
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-8 font-mono tracking-wide bg-gradient-to-br from-black via-gray-900 to-black text-white">
+
+  <div class="flex flex-col md:flex-row justify-between items-center mb-10 space-y-4 md:space-y-0">
+    <div>
+      <h1 class="text-4xl font-extrabold text-cyan-300 glow">🧠 Welcome, {{ username }} {% if is_admin %}(Admin){% endif %}</h1>
+      <p class="text-sm text-gray-400 mt-2" style="font-size: large;"><br>
+        📅 Selected Date:
+        <span class="text-purple-300 font-semibold bg-white bg-opacity-10 px-3 py-1 rounded-lg glass">{{ selected_date }}</span>
+      </p>
+    </div>
+
+    <div class="flex gap-4">
+      <a href="/select-date"
+         class="relative inline-flex items-center justify-center px-6 py-2 font-semibold text-cyan-300 border-2 border-cyan-400 rounded-lg glow transition-all duration-300 ease-in-out hover:text-white hover:bg-cyan-600">
+        <span class="z-10 relative">📆 Change Date</span>
+      </a>
+      <a href="/logout"
+         class="relative inline-flex items-center justify-center px-6 py-2 font-semibold text-pink-300 border-2 border-pink-500 rounded-lg glow-red transition-all duration-300 ease-in-out hover:text-white hover:bg-pink-600">
+        <span class="z-10 relative">🚪 Logout</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {% for slot, booked_by in slots.items() %}
+      <div class="glass rounded-2xl p-6 glow border-2 border-gray-800 transition transform hover:scale-105 duration-300 shadow-xl">
+        <h2 class="text-xl font-semibold text-purple-300">{{ slot }}</h2>
+        <p class="text-sm text-gray-300 mt-2 mb-4">
+          {{ '🔒 Booked by ' + booked_by if booked_by else '🟢 Available' }}
+        </p>
+
+        {% if not booked_by %}
+          <form onsubmit="event.preventDefault(); bookSlot('{{ slot }}');">
+            <button class="w-full bg-green-500 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl transition duration-200">
+              ✅ Book
+            </button>
+          </form>
+        {% elif booked_by == username or is_admin %}
+          <form onsubmit="event.preventDefault(); cancelSlot('{{ slot }}');">
+            <button class="w-full {{ 'bg-yellow-400 text-black' if booked_by == username else 'bg-red-500 text-white' }} hover:opacity-90 font-bold px-4 py-2 rounded-xl transition duration-200">
+              {{ '❌ Cancel' if booked_by == username else '🛑 Admin: Cancel' }}
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+  async function bookSlot(slot) {
+    const name = "{{ username }}";
+    const selectedDate = "{{ selected_date }}";
+
+    if (!slot || !name || !selectedDate) {
+      alert("❌ Invalid booking request. Please ensure all fields are selected.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `slot=${encodeURIComponent(slot)}`
+      });
+      const result = await response.json();
+      alert(result.message);
+      if (result.status === "success") {
+        location.reload();
+      }
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ Something went wrong while booking.");
+    }
+  }
+
+  async function cancelSlot(slot) {
+    if (!slot) {
+      alert("❌ Invalid slot selected for cancellation.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `slot=${encodeURIComponent(slot)}`
+      });
+      const result = await response.json();
+      alert(result.message);
+      if (result.status === "success") {
+        location.reload();
+      }
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ Something went wrong while cancelling.");
+    }
+  }
+</script>
+
+</body>
+</html>
