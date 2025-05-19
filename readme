@@ -21,3 +21,20 @@ flask
 to ruun:
 python app.py
 Open your browser and go to http://127.0.0.1:5000
+Time Window:
+ Generates slots from 10:00 to 17:00 by default.
+ Each slot is 1 hour long.
+Demand Scoring (calculate_demand_score(hour)):
+ Base demand is determined by time of day:
+ High demand: 11 AM – 2 PM (+0.5)
+ Moderate demand: 10 AM, 4 PM (+0.2)
+ Other times: +0.35
+ Adds a user bias (preference scores based on hour).
+ Includes a weekday bias (+0.1).
+ Adds a small random jitter to avoid deterministic patterns.
+Slot Assignment (generate_slots()):
+ For each hour in the range:
+ If the total score > 0.65:
+ Randomly assigns a staff member (e.g., “Alice”, “Bob”).
+ Else:
+ The slot is left unassigned (None = available).
