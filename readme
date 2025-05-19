@@ -17,6 +17,7 @@ Project Structure
 │   └── select_date.html
 Requirements
 Python 3.10+
+flask
 to ruun:
 python app.py
 Open your browser and go to http://127.0.0.1:5000
