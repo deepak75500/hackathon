@@ -1,0 +1,22 @@
+Appointment Booking Web App
+This is a simple web-based appointment booking application built with Python and Flask. Users can log in, select dates, and book available slots through an intuitive interface.
+
+Features
+User login system
+Slot selection for appointments
+Date picker for booking
+HTML templates for interface pages
+
+Project Structure
+.
+├── app.py                  # Main Flask application
+├── slots.py                # Slot handling logic
+├── templates/              # HTML templates
+│   ├── index.html
+│   ├── login.html
+│   └── select_date.html
+Requirements
+Python 3.10+
+to ruun:
+python app.py
+Open your browser and go to http://127.0.0.1:5000
